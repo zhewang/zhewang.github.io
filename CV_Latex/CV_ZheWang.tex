@@ -1,0 +1,409 @@
+\documentclass[10pt]{article}
+\usepackage{calc}
+
+\reversemarginpar
+\usepackage[paper=letterpaper,
+            marginparwidth=1.2in,     % Length of section titles
+            marginparsep=.05in,       % Space between titles and text
+            margin=1in,               % 1 inch margins
+            includemp]{geometry}
+
+\setlength{\parindent}{0in}
+
+\usepackage[shortlabels]{enumitem}
+
+\makeatletter
+\newlength{\bibhang}
+\setlength{\bibhang}{1em}
+\newlength{\bibsep}
+ {\@listi \global\bibsep\itemsep \global\advance\bibsep by\parsep}
+\newlist{bibsection}{itemize}{3}
+\setlist[bibsection]{label=,leftmargin=\bibhang,%
+        itemindent=-\bibhang,
+        itemsep=\bibsep,parsep=\z@,partopsep=0pt,
+        topsep=0pt}
+\newlist{bibenum}{enumerate}{3}
+\setlist[bibenum]{label=[\arabic*],resume,leftmargin={\bibhang+\widthof{[999]}},%
+        itemindent=-\bibhang,
+        itemsep=\bibsep,parsep=\z@,partopsep=0pt,
+        topsep=0pt}
+\let\oldendbibenum\endbibenum
+\def\endbibenum{\oldendbibenum\vspace{-.6\baselineskip}}
+\let\oldendbibsection\endbibsection
+\def\endbibsection{\oldendbibsection\vspace{-.6\baselineskip}}
+\makeatother
+
+\usepackage{fancyhdr,lastpage}
+\pagestyle{fancy}
+%\pagestyle{empty}      % Uncomment this to get rid of page numbers
+\fancyhf{}\renewcommand{\headrulewidth}{0pt}
+\fancyfootoffset{\marginparsep+\marginparwidth}
+\newlength{\footpageshift}
+\setlength{\footpageshift}
+          {0.5\textwidth+0.5\marginparsep+0.5\marginparwidth-2in}
+\lfoot{\hspace{\footpageshift}%
+       \parbox{4in}{\, \hfill %
+                    \arabic{page} of \protect\pageref*{LastPage}
+                    \hfill \,}}
+
+% Finally, give us PDF bookmarks
+\usepackage{color,hyperref}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.3}
+\hypersetup{colorlinks,breaklinks,
+            linkcolor=darkblue,urlcolor=darkblue,
+            anchorcolor=darkblue,citecolor=darkblue}
+
+
+\newcommand{\makeheading}[2][]%
+        {\hspace*{-\marginparsep minus \marginparwidth}%
+         \begin{minipage}[t]{\textwidth+\marginparwidth+\marginparsep}%
+             {\large \bfseries #2 \hfill #1}\\[-0.15\baselineskip]%
+                 \rule{\columnwidth}{1pt}%
+         \end{minipage}}
+
+%%% SECTION HEADINGS
+
+% The section headings. Flush left in small caps down pseudo-margin.
+%
+% Usage: \section{section name}
+\renewcommand{\section}[1]{\pagebreak[3]%
+    \vspace{1.3\baselineskip}%
+    \phantomsection\addcontentsline{toc}{section}{#1}%
+    \noindent\llap{\scshape\smash{\parbox[t]{\marginparwidth}{\hyphenpenalty=10000\raggedright #1}}}%
+    \vspace{-\baselineskip}\par}
+
+%%% LISTS
+
+% This macro alters a list by removing some of the space that follows the list
+% (is used by lists below)
+\newcommand*\fixendlist[1]{%
+    \expandafter\let\csname preFixEndListend#1\expandafter\endcsname\csname end#1\endcsname
+    \expandafter\def\csname end#1\endcsname{\csname preFixEndListend#1\endcsname\vspace{-0.6\baselineskip}}}
+
+% These macros help ensure that items in outer-type lists do not get
+% separated from the next line by a page break
+% (they are used by lists below)
+\let\originalItem\item
+\newcommand*\fixouterlist[1]{%
+    \expandafter\let\csname preFixOuterList#1\expandafter\endcsname\csname #1\endcsname
+    \expandafter\def\csname #1\endcsname{\csname preFixOuterList#1\endcsname\let\oldItem\item\def\item{\pagebreak[2]\oldItem}}
+    \expandafter\let\csname preFixOuterListend#1\expandafter\endcsname\csname end#1\endcsname
+    \expandafter\def\csname end#1\endcsname{\let\item\oldItem\csname preFixOuterListend#1\endcsname}}
+\newcommand*\fixinnerlist[1]{%
+    \expandafter\let\csname preFixInnerList#1\expandafter\endcsname\csname #1\endcsname
+    \expandafter\def\csname #1\endcsname{\let\oldItem\item\let\item\originalItem\csname preFixInnerList#1\endcsname}
+    \expandafter\let\csname preFixInnerListend#1\expandafter\endcsname\csname end#1\endcsname
+    \expandafter\def\csname end#1\endcsname{\csname preFixInnerListend#1\endcsname\let\item\oldItem}}
+
+% An itemize-style list with lots of space between items
+%
+% Usage:
+%   \begin{outerlist}
+%       \item ...    % (or \item[] for no bullet)
+%   \end{outerlist}
+\newlist{outerlist}{itemize}{3}
+    \setlist[outerlist]{label=\enskip\textbullet,leftmargin=*}
+    \fixendlist{outerlist}
+    \fixouterlist{outerlist}
+
+% An environment IDENTICAL to outerlist that has better pre-list spacing
+% when used as the first thing in a \section
+%
+% Usage:
+%   \begin{lonelist}
+%       \item ...    % (or \item[] for no bullet)
+%   \end{lonelist}
+\newlist{lonelist}{itemize}{3}
+    \setlist[lonelist]{label=\enskip\textbullet,leftmargin=*,partopsep=0pt,topsep=0pt}
+    \fixendlist{lonelist}
+    \fixouterlist{lonelist}
+
+% An itemize-style list with little space between items
+%
+% Usage:
+%   \begin{innerlist}
+%       \item ...    % (or \item[] for no bullet)
+%   \end{innerlist}
+\newlist{innerlist}{itemize}{3}
+    \setlist[innerlist]{label=\enskip\textbullet,leftmargin=*,parsep=0pt,itemsep=0pt,topsep=0pt,partopsep=0pt}
+    \fixinnerlist{innerlist}
+
+% An environment IDENTICAL to innerlist that has better pre-list spacing
+% when used as the first thing in a \section
+%
+% Usage:
+%   \begin{loneinnerlist}
+%       \item ...    % (or \item[] for no bullet)
+%   \end{loneinnerlist}
+\newlist{loneinnerlist}{itemize}{3}
+    \setlist[loneinnerlist]{label=\enskip\textbullet,leftmargin=*,parsep=0pt,itemsep=0pt,topsep=0pt,partopsep=0pt}
+    \fixendlist{loneinnerlist}
+    \fixinnerlist{loneinnerlist}
+
+%%% EXTRA SPACE
+
+% To add some paragraph space between lines.
+% This also tells LaTeX to preferably break a page on one of these gaps
+% if there is a needed pagebreak nearby.
+\newcommand{\blankline}{\quad\pagebreak[3]}
+\newcommand{\halfblankline}{\quad\vspace{-0.5\baselineskip}\pagebreak[3]}
+
+%%% FORMATTING MACROS
+
+% Uses hyperref to link DOI
+\newcommand\doilink[1]{\href{http://dx.doi.org/#1}{#1}}
+\newcommand\doi[1]{doi:\doilink{#1}}
+
+% For \url{SOME_URL}, links SOME_URL to the url SOME_URL
+\providecommand*\url[1]{\href{#1}{#1}}
+% Same as above, but pretty-prints SOME_URL in teletype fixed-width font
+\renewcommand*\url[1]{\href{#1}{\texttt{#1}}}
+
+% For \email{ADDRESS}, links ADDRESS to the url mailto:ADDRESS
+\providecommand*\email[1]{\href{mailto:#1}{#1}}
+
+\providecommand\BibTeX{{B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    \TeX}}
+\providecommand\Matlab{\textsc{Matlab}}
+
+% Custom hyphenation rules for words that LaTeX has trouble with
+\hyphenation{bio-mim-ic-ry bio-in-spi-ra-tion re-us-a-ble pro-vid-er}
+
+%%%%%%%%%%%%%%%%%%%%%%%% End Helper Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Begin CV Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\makeheading{Zhe Wang}
+
+\section{Contact Information}
+
+\newlength{\rcollength}\setlength{\rcollength}{2in}%
+\newlength{\spacewidth}\setlength{\spacewidth}{12pt}
+\newcommand\spacechar{$|$}
+%
+\begin{tabular}[t]{@{}p{\textwidth-\rcollength-\spacewidth}@{}p{\spacewidth}@{}p{\rcollength}}%
+
+% Address box
+\parbox{\textwidth-\rcollength-\spacewidth}{%
+3nd year PhD Student\\
+\href{http://www.cs.arizona.edu/}{Department of Computer Science}\\
+\href{http://www.arizona.edu/}{The University of Arizona}}
+
+% Cheesy perforated vertical bar between boxes
+% Shorten by removing \spacechar's
+& \parbox{\spacewidth}{\centering \spacechar\\\spacechar\\\spacechar\\\spacechar\\\spacechar} &
+
+% Non-snail-mail contact information
+\parbox{\rcollength}{%
+\textit{Cell:} +1-(520)3699297 \\
+\textit{E-mail:} \email{zhew@email.arizona.edu}\\
+\textit{Web:} \href{http://www.z-wang.com/}{www.z-wang.com}}
+
+\end{tabular}
+
+
+\section{Research Interests}
+
+Big Data Visualization, Exploratory Data Analysis, Data Visualization Systems
+
+\section{Education}
+
+\href{http://www.arizona.edu/}{\textbf{The University of Arizona }}Tucson, AZ, USA \hfill {Aug. 2014 to present}
+\begin{outerlist}
+
+\item[] PhD Student,
+        \href{http://www.cs.arzona.edu/}
+             {Department of Computer Science}
+        \begin{innerlist}
+        \item Advisor: \href{http://cscheid.net/}{Dr. Carlos Scheidegger}
+        \item I also worked with \href{http://www.cs.arizona.edu/~rts/}{Dr. Richard T. Snodgrass}
+        \end{innerlist}
+
+\end{outerlist}
+
+\halfblankline
+
+\href{http://english.cas.cn/}{\textbf{Chinese Academy of Sciences }}Beijing, China \hfill {Sep. 2011 to June 2014}
+\begin{outerlist}
+
+\item[] M.S.,
+        \href{http://english.ict.cas.cn/}
+             {Institute of Computing Technology }(ICT)
+        \begin{innerlist}
+        \item Advisor:
+              \href{http://sourcedb.ict.cas.cn/en/eictexpert/fas/200909/t20090917_2496673.html}
+                   {Dr. Hong Liu}
+        \end{innerlist}
+
+\end{outerlist}
+
+\halfblankline
+
+\href{http://en.nenu.edu.cn/}{\textbf{Northeast Normal University }}Changchun, China \hfill {Sep. 2007 to June 2011}
+\begin{outerlist}
+
+\item[] B.E.,
+        \href{http://soft.nenu.edu.cn/index.shtml}
+             {College of Software Engineering}
+        \begin{innerlist}
+        \item Major: Software Engineering
+        \end{innerlist}
+
+\end{outerlist}
+
+\section{Research Projects}
+
+\textbf{Gaussian Cubes} (Sep. 2015 to present)
+\begin{innerlist}
+\item Real-Time Modeling for Visual Exploration of Large Multidimensional Datasets
+\end{innerlist}
+
+\halfblankline
+
+\textbf{ANTARES} (Aug. 2014 to present)
+\begin{innerlist}
+\item The Arizona-NOAO Temporal Analysis and Response to Events System
+\item Architecture Team Member (Aug. 2014 to present)
+\item Visualization Team Member (Aug. 2015 to present)
+\item Chief Programmer (Aug. 2015 to present)
+\end{innerlist}
+
+\halfblankline
+
+\textbf{Obstacle Avoidance System for the Blind} (June 2012 to May 2014 - M.S. Thesis Project)
+\begin{innerlist}
+\item An electronic travel aid to help the visually impaired walk safely using RGB-D sensors
+\item Primary Researcher \& Programmer
+\end{innerlist}
+
+\halfblankline
+
+\textbf{3D Scanning and Printing System} (June 2013 to July 2013)
+\begin{innerlist}
+\item Reconstruct the 3D model of an object in real time using Kinect and KinFu for 3D printer
+\item Primary Researcher \& Programmer Printers
+\end{innerlist}
+
+\halfblankline
+
+\textbf{Crowd Density Estimation} (Sep. 2011 to June 2012)
+\begin{innerlist}
+\item Propose a novel feature for crowd density estimation: the Local Binary Pattern Co-Occurrence Matrix
+\item Primary Researcher \& Programmer
+\end{innerlist}
+
+\halfblankline
+
+\textbf{KidSpark} (Sep 2009 to Apr. 2010)
+\begin{innerlist}
+\item Use a projector and a infrared pen to turn a plane wall into an interactive white board
+\item Software Team Member
+\end{innerlist}
+
+\section{Publications}
+
+\begin{bibenum}
+    \item \textbf{Zhe Wang}, Nivan Ferreira, Youhao Wei, Aarthy Bhaskar, Carlos Scheidegger. Gaussian Cubes: Real-Time Modeling for Visual Exploration of Large Multidimensional Datasets. 
+        \emph{Accepted to IEEE InfoVis 2016, IEEE TVCG, to apper.}
+
+    \item Abhijit Saha, \textbf{Zhe Wang}, Thomas Matheson, et al. "ANTARES: Progress towards building a ‘Broker’ of time-domain alerts". 
+        In: \emph{Proc. SPIE 9910, Observatory Operations: Strategies, Processes, and Systems VI, 99100F} (July 18, 2016)
+
+    \item \textbf{Zhe Wang}, Hong Liu, Xiangdong Wang, and Yueliang Qian. Segment and Label Indoor Scene based on RGB-D for the Visually Impaired.
+        In: \emph{International Conference on Multimedia Modeling}(\textbf{MMM}), 2014.
+        (Accepted as oral presentation)
+
+    \item Hong Liu, \textbf{Zhe Wang}, Xiangdong Wang, Guoying Zhao, and Yueliang Qian. Adaptive Scene Segmentation and Obstacle Detection for the Blind.
+        \emph{Journal of Computer-Aided Design and Computer Graphics}(\textbf{JCAD}), 25(12), 1818-1825, 2013.
+
+    \item \textbf{Zhe Wang}, Hong Liu, Yueliang Qian, and Tao Xu. Real-Time Plane Segmentation and Obstacle Detection of 3D Point Clouds for Indoor Scenes.
+        In: \emph{The 2nd Workshop on Consumer Depth Cameras for Computer Vision, in conjunction with European Conference on Computer Vision} (\textbf{ECCV}), 2012.
+
+    \item \textbf{Zhe Wang}, Hong Liu, Yueliang Qian, and Tao Xu. Crowd Density Estimation Based On Local Binary Pattern Co-Occurrence Matrix.
+        In: \emph{the 2nd IEEE International Workshop on Advances in Automated Multimedia Surveillance for Public Safety, in conjunction with IEEE International Conference on Multimedia and Expo }(\textbf{ICME}), 2012.
+
+    \item Tao Xu, Hong Liu, Yueliang Qian and \textbf{Zhe Wang}. A Fast and Roust Pedestrian Detection Framework based on Static and Dynamic Information.
+        In: \emph{IEEE International Conference on Multimedia and Expo} (\textbf{ICME}). 2012.
+\end{bibenum}
+
+%\section{Works-In-Progress}
+%\begin{innerlist}
+    %\item Zhe Wang and Carlos Scheidegger. Real-time Interactive Visualization of PCA for Big Data. Preparing for InfoVis 2016.
+%\end{innerlist}
+
+\section{Work Experience}
+
+\textbf{Department of Computer Science, The University of Arizona}\\
+Tucson, AZ, USA
+\begin{innerlist}
+\item Research Assistant \hfill {Aug. 2014 to present}
+\end{innerlist}
+
+\halfblankline
+
+\textbf{Institute of Computing Technology, Chinese Academy of Science}\\
+Beijing, China
+\begin{innerlist}
+\item Research Assistant \hfill {Sep. 2011 to June 2014}
+\end{innerlist}
+
+\halfblankline
+
+\textbf{Jingshi Information Technology Co., Ltd.}\\
+Hangzhou, China
+\begin{innerlist}
+\item Co-Founder \hfill {Apr. 2011 to July 2013}
+\end{innerlist}
+
+\halfblankline
+
+\textbf{IDEAL Research Institute of Information Technology, Northeast Normal University}\\
+Changchun, China
+\begin{innerlist}
+\item Research Assistant \hfill {Sep. 2008 to Sep. 2010}
+\end{innerlist}
+
+\section{Awards}
+
+\begin{innerlist}
+\item Dongshi Medal, NENU (\textbf{top 38} students of the university) (2011)
+\item National Second Prize in Microsoft Imagine Cup Software Design (\textbf{top 3} projects in China) (2010)
+\item National Second Prize in Microsoft Imagine Cup Multipoint Education Award (\textbf{top 2} projects in China) (2009)
+\item Presidential Scholarship, NENU (\textbf{top 1\%} students) (2008, 2009, 2010, 2011)
+\end{innerlist}
+
+%\section{Skills}
+
+  %\textbf{Programming Language}: C/C++, Python, Javascript, C\#, SQL,  \\
+  %\textbf{Library and Tools}: D3, Numpy, Scipy, OpenCV, PCL, Matplotlib, Latex, Vim \\
+  %\textbf{OS}: OSX, Linux, Windows \\
+
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% End CV Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------%
+% The following is copyright and licensing information for
+% redistribution of this LaTeX source code; it also includes a liability
+% statement. If this source code is not being redistributed to others,
+% it may be omitted. It has no effect on the function of the above code.
+%----------------------------------------------------------------------%
+% Copyright (c) 2007, 2008, 2009, 2010, 2011 by Theodore P. Pavlic
+%
+% Unless otherwise expressly stated, this work is licensed under the
+% Creative Commons Attribution-Noncommercial 3.0 United States License. To
+% view a copy of this license, visit
+% http://creativecommons.org/licenses/by-nc/3.0/us/ or send a letter to
+% Creative Commons, 171 Second Street, Suite 300, San Francisco,
+% California, 94105, USA.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+% OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+% IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+% CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+% TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+% SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+%----------------------------------------------------------------------% 
